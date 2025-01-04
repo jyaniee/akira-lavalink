@@ -59,7 +59,10 @@ public class CommandHandler extends ListenerAdapter {
                                 ),
                         Commands.slash("재한바보", "어디 한 번 해보쇼."),
                         Commands.slash("안녕", "간단한 인사를 합니다."),
-                        Commands.slash("대기열", "현재 대기열을 표시합니다.")
+                        Commands.slash("대기열", "현재 대기열을 표시합니다."),
+                        Commands.slash("볼륨", "음악 볼륨을 조정합니다.")
+                                .addOption(OptionType.INTEGER, "볼륨", "설정할 볼륨 값 (0 ~ 100)", true),
+                        Commands.slash("스킵", "현재 재생 중인 곡을 스킵합니다.")
 
                      //   Commands.slash("lava-search", "고급 검색 기능을 사용합니다.")
                      //           .addOption(OptionType.STRING, "query", "검색할 음악 제목", true)
@@ -71,14 +74,16 @@ public class CommandHandler extends ListenerAdapter {
         switch (event.getFullCommandName()){
             case "들어가기" -> new Join().execute(event);
             case "나가기" -> new Leave().execute(event);
-            case "정지" -> new Stop(client).execute(event);
-            case "재생" -> new Play(client).execute(event);
+            case "정지" -> new Stop(client, this).execute(event);
+            case "재생" -> new Play(client, this).execute(event);
             case "일시정지" -> new Pause(client).execute(event);
             case "현재곡" -> new NowPlaying(client).execute(event);
           //  case "lava-search" -> new LavaSearchCommand(client).execute(event);
             case "재한바보" -> new Babo().execute(event);
             case "안녕" -> new Hello().sayHello(event);
-            case "대기열" -> new Queue(client).execute(event);
+            case "대기열" -> new Queue(client, this).execute(event);
+            case "볼륨" -> new Volume(client, this).execute(event);
+            case "스킵" -> new Skip(client, this).execute(event);
         }
     }
     @Override
@@ -111,6 +116,10 @@ public class CommandHandler extends ListenerAdapter {
             });
             return;
         }
+    }
+
+    public GuildMusicManager getOrCreateMusicManager(long guildId) {
+        return this.musicManagers.computeIfAbsent(guildId, id -> new GuildMusicManager(id, client));
     }
 
 }

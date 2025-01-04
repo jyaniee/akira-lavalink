@@ -7,6 +7,7 @@ import dev.arbjerg.lavalink.client.LavalinkClient;
 import dev.arbjerg.lavalink.client.Link;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,8 +18,11 @@ public class Play {
     private final LavalinkClient client;
     public final Map<Long, GuildMusicManager> musicManagers = new HashMap<>();
 
-    public Play(LavalinkClient client) {
+    private final CommandHandler commandHandler;
+
+    public Play(LavalinkClient client, CommandHandler commandHandler) {
         this.client = client;
+        this.commandHandler = commandHandler;
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -36,7 +40,7 @@ public class Play {
 
         final long guildId = event.getGuild().getIdLong();
         final Link link = this.client.getOrCreateLink(guildId);
-        final var mngr = this.getOrCreateMusicManager(guildId);
+        final var mngr = commandHandler.getOrCreateMusicManager(guildId);
 
         if(isValidURI(identifier)){
             // URI일 경우
@@ -57,7 +61,7 @@ public class Play {
             return false;
         }
     }
-
+/*
     public GuildMusicManager getOrCreateMusicManager(long guildId) {
         synchronized(this) {
             var mng = this.musicManagers.get(guildId);
@@ -70,4 +74,5 @@ public class Play {
             return mng;
         }
     }
+ */
 }

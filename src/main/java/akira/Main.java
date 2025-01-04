@@ -1,5 +1,7 @@
 package akira;
 
+import akira.commands.Play;
+import akira.commands.Queue;
 import akira.listener.CommandHandler;
 import dev.arbjerg.lavalink.client.event.*;
 import dev.arbjerg.lavalink.client.Helpers;
@@ -133,7 +135,7 @@ public class Main {
             final LavalinkNode node = event.getNode();
 
             LOG.info(
-                    "노드 '{}' 통계: 현재 프레이어 {}/{} (링크 수: {})",
+                    "노드 '{}' 통계: 현재 플레이어 {}/{} (링크 수: {})",
                     node.getName(),
                     event.getPlayingPlayers(),
                     event.getPlayers(),
