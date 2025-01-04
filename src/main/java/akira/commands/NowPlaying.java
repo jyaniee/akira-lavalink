@@ -12,6 +12,18 @@ public class NowPlaying {
         this.client = client;
     }
 
+    private String formatTIme(long millis){
+        long seconds = (millis / 1000) % 60;
+        long minutes = (millis / (1000 * 60)) % 60;
+        long hours = (millis / (1000 * 60 * 60));
+
+        if(hours > 0){
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        } else {
+            return String.format("%02d:%02d", minutes, seconds);
+        }
+    }
+
     public void execute(SlashCommandInteractionEvent event){
         Guild guild = event.getGuild();
         final var link = this.client.getOrCreateLink(guild.getIdLong());
@@ -30,11 +42,15 @@ public class NowPlaying {
 
         final var trackInfo = track.getInfo();;
 
+        String currentTime = formatTIme(player.getPosition());
+        String trackLength = formatTIme(trackInfo.getLength());
+
+
         event.reply(
                 "현재 재생 중: %s\n재생 시간: %s/%s\n요청자: <@%s>".formatted(
                         trackInfo.getTitle(),
-                        player.getPosition(),
-                        trackInfo.getLength(),
+                        currentTime,
+                        trackLength,
                         track.getUserData(MyUserData.class).requester()
                 )
         ).queue();

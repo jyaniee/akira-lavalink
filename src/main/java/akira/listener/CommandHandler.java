@@ -43,12 +43,12 @@ public class CommandHandler extends ListenerAdapter {
 
         event.getJDA().updateCommands()
                 .addCommands(
-                        Commands.slash("join", "음성 채널에 참가합니다."),
-                        Commands.slash("leave", "음성 채널에서 나갑니다."),
-                        Commands.slash("stop", "현재 트랙을 정지합니다."),
-                        Commands.slash("pause", "플레이어를 일시정지 또는 해제 합니다."),
-                        Commands.slash("now-playing", "현재 재생 중인 음악을 보여줍니다."),
-                        Commands.slash("play", "음악을 재생합니다.")
+                        Commands.slash("들어가기", "음성 채널에 들어갑니다."),
+                        Commands.slash("나가기", "음성 채널에서 나갑니다."),
+                        Commands.slash("정지", "현재 트랙을 정지합니다."),
+                        Commands.slash("일시정지", "플레이어를 일시정지 또는 해제 합니다."),
+                        Commands.slash("현재곡", "현재 재생 중인 음악을 보여줍니다."),
+                        Commands.slash("재생", "음악을 재생합니다.")
                                 .addOptions(
                                         new OptionData(OptionType.STRING, "플랫폼", "검색하려는 플랫폼을 선택하세요.", true)
                                                 .addChoice("Youtube", "ytsearch")
@@ -56,7 +56,9 @@ public class CommandHandler extends ListenerAdapter {
                                         new OptionData(OptionType.STRING, "쿼리", "검색할 음악 제목/URI를 입력하세요.", true)
                                                 .setAutoComplete(true)
 
-                                )
+                                ),
+                        Commands.slash("재한바보", "어디 한 번 해보쇼."),
+                        Commands.slash("안녕", "간단한 인사를 합니다.")
 
                      //   Commands.slash("lava-search", "고급 검색 기능을 사용합니다.")
                      //           .addOption(OptionType.STRING, "query", "검색할 음악 제목", true)
@@ -66,13 +68,15 @@ public class CommandHandler extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         switch (event.getFullCommandName()){
-            case "join" -> new Join().execute(event);
-            case "leave" -> new Leave().execute(event);
-            case "stop" -> new Stop(client).execute(event);
-            case "play" -> new Play(client).execute(event);
-            case "pause" -> new Pause(client).execute(event);
-            case "now-playing" -> new NowPlaying(client).execute(event);
+            case "들어가기" -> new Join().execute(event);
+            case "나가기" -> new Leave().execute(event);
+            case "정지" -> new Stop(client).execute(event);
+            case "재생" -> new Play(client).execute(event);
+            case "일시정지" -> new Pause(client).execute(event);
+            case "현재곡" -> new NowPlaying(client).execute(event);
           //  case "lava-search" -> new LavaSearchCommand(client).execute(event);
+            case "재한바보" -> new Babo().execute(event);
+            case "안녕" -> new Hello().sayHello(event);
         }
     }
     @Override
