@@ -2,6 +2,7 @@ package akira.commands;
 
 import akira.MyUserData;
 import dev.arbjerg.lavalink.client.LavalinkClient;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -30,13 +31,23 @@ public class NowPlaying {
         final var player = link.getCachedPlayer();
 
         if(player == null){
-            event.reply("채널에 연결되어있지 않거나 플레이어가 존재하지 않습니다.").queue();
+            // event.reply("채널에 연결되어있지 않거나 플레이어가 존재하지 않습니다.").queue();
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle("⚠️ 플레이어가 존재하지 않습니다.");
+            embed.setDescription("봇이 음성 채널에 연결되어 있지 않거나 현재 활성화된 플레이어가 없습니다.");
+            embed.setColor(0xE74C3C); // 레드톤
+            event.replyEmbeds(embed.build()).queue();
             return;
         }
         final var track = player.getTrack();
 
         if(track == null){
-            event.reply("재생 중인 음악이 없습니다!").queue();
+           // event.reply("재생 중인 음악이 없습니다!").queue();
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle("⚠️ 재생 중인 음악이 없습니다!");
+            embed.setDescription("현재 재생 중인 음악이 없습니다. 플레이어에 곡을 추가해보세요.");
+            embed.setColor(0xE74C3C); // 레드톤
+            event.replyEmbeds(embed.build()).queue();
             return;
         }
 
@@ -46,7 +57,7 @@ public class NowPlaying {
         String trackLength = formatTIme(trackInfo.getLength());
 
 
-        event.reply(
+       /* event.reply(
                 "현재 재생 중: %s\n재생 시간: %s/%s\n요청자: <@%s>".formatted(
                         trackInfo.getTitle(),
                         currentTime,
@@ -54,5 +65,16 @@ public class NowPlaying {
                         track.getUserData(MyUserData.class).requester()
                 )
         ).queue();
+
+        */
+
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle("🎵 현재 재생 중: " + trackInfo.getTitle(), trackInfo.getUri());
+        embed.setDescription("**재생 시간:** `%s / %s`".formatted(currentTime, trackLength));
+        embed.setColor(0x1DB954);
+        embed.setThumbnail("https://img.youtube.com/vi/" + trackInfo.getIdentifier() + "/hqdefault.jpg"); // 썸네일 이미지
+        embed.addField("요청자", "<@" + track.getUserData(MyUserData.class).requester() + ">", false);
+
+        event.replyEmbeds(embed.build()).queue();
     }
 }

@@ -1,13 +1,17 @@
 package akira.music;
 
+import akira.MyUserData;
 import dev.arbjerg.lavalink.client.player.PlaylistLoaded;
 import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.client.player.TrackLoaded;
 import dev.arbjerg.lavalink.protocol.v4.Message;
+import net.dv8tion.jda.api.EmbedBuilder;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.time.format.DateTimeFormatter;
 
 public class TrackScheduler {
     private final GuildMusicManager guildMusicManager;
@@ -59,8 +63,27 @@ public class TrackScheduler {
         // Your homework: Send a message to the channel somehow, have fun!
         // ㅇㅋ 메시지 보내기 추가
         this.guildMusicManager.getTextChannel().ifPresent(textChannel -> {
-            String message = "\uD83C\uDFB5 현재 재생 중: **" + track.getInfo().getTitle() + "**\n\uD83D\uDD17 [곡 링크](" + track.getInfo().getUri() + ")";
-            textChannel.sendMessage(message).queue();
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle("\uD83C\uDFB5 현재 재생 중: " + track.getInfo().getTitle(), track.getInfo().getUri());
+
+            embed.setDescription("이 순간을 음악으로 채워보세요. ✨");
+            // 곡 길이 (포맷팅: mm:ss)
+            long durationMs = track.getInfo().getLength();
+            String formattedDuration = String.format("%02d:%02d",
+                    (durationMs / 1000) / 60, // 분
+                    (durationMs / 1000) % 60  // 초
+            );
+            embed.addField("곡 길이", formattedDuration, true); // 인라인 필드
+            embed.addField("요청자", "<@" + track.getUserData(MyUserData.class).requester() + ">", false);
+
+            String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            embed.setFooter("• " + currentTime, null);
+            embed.setColor(0x1DB954); // Spotify 그린 컬러 (16진수 색상 코드)
+            embed.setThumbnail("https://img.youtube.com/vi/" + track.getInfo().getIdentifier() + "/hqdefault.jpg"); // 썸네일 이미지
+            // String message = "\uD83C\uDFB5 현재 재생 중: **" + track.getInfo().getTitle() + "**\n\uD83D\uDD17 [곡 링크](" + track.getInfo().getUri() + ")";
+            // textChannel.sendMessage(message).queue();
+
+            textChannel.sendMessageEmbeds(embed.build()).queue();
         });
         System.out.println("Track started: " + track.getInfo().getTitle());
     }

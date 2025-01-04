@@ -1,6 +1,7 @@
 package akira.commands;
 
 import akira.listener.CommandHandler;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -32,7 +33,13 @@ public class Join {
             
             // 연결
             event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
-            event.reply("채널에 참가합니다.").queue();
+
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle("\uD83D\uDD17 음성 채널에 참가합니다!");
+            embed.setDescription("봇이 음성 채널 `" + channel.getName() + "`에 참가했습니다.");
+            embed.setColor(0x1DB954);
+            // event.reply("채널에 참가합니다.").queue();
+            event.replyEmbeds(embed.build()).queue();
         } else {
             event.reply("먼저 음성 채널에 들어가세요!").queue();
         }
