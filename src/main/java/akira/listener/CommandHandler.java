@@ -58,7 +58,8 @@ public class CommandHandler extends ListenerAdapter {
 
                                 ),
                         Commands.slash("재한바보", "어디 한 번 해보쇼."),
-                        Commands.slash("안녕", "간단한 인사를 합니다.")
+                        Commands.slash("안녕", "간단한 인사를 합니다."),
+                        Commands.slash("대기열", "현재 대기열을 표시합니다.")
 
                      //   Commands.slash("lava-search", "고급 검색 기능을 사용합니다.")
                      //           .addOption(OptionType.STRING, "query", "검색할 음악 제목", true)
@@ -77,6 +78,7 @@ public class CommandHandler extends ListenerAdapter {
           //  case "lava-search" -> new LavaSearchCommand(client).execute(event);
             case "재한바보" -> new Babo().execute(event);
             case "안녕" -> new Hello().sayHello(event);
+            case "대기열" -> new Queue(client).execute(event);
         }
     }
     @Override

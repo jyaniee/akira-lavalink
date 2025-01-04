@@ -16,12 +16,16 @@ public class TrackScheduler {
     }
 
     public void enqueue(Track track) {
+        System.out.println("[TrackScheduler] Track to enqueue: " + track.getInfo().getTitle());
+
+
         this.guildMusicManager.getPlayer().ifPresentOrElse(
                 (player) -> {
                     if (player.getTrack() == null) {
                         this.startTrack(track);
                     } else {
                         this.queue.offer(track);
+                        System.out.println("[TrackScheduler] Queue size after enqueue: " + this.queue.size());
                     }
                 },
                 () -> {

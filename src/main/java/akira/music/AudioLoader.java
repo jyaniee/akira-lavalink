@@ -26,6 +26,8 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
         track.setUserData(userData);
 
+        System.out.println("[AudioLoader] Track to enqueue: "+track.getInfo().getTitle());
+
         this.mngr.scheduler.enqueue(track);
 
         final var trackTitle = track.getInfo().getTitle();
