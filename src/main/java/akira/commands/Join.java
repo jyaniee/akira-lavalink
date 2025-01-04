@@ -41,7 +41,12 @@ public class Join {
             // event.reply("채널에 참가합니다.").queue();
             event.replyEmbeds(embed.build()).queue();
         } else {
-            event.reply("먼저 음성 채널에 들어가세요!").queue();
+           // event.reply("먼저 음성 채널에 들어가세요!").queue();
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle("⚠️ 음성 채널에 들어가세요!");
+            embed.setDescription("음성 채널에 참가한 후 명령어를 다시 실행해주세요.");
+            embed.setColor(0xE74C3C); // 레드톤
+            event.replyEmbeds(embed.build()).queue();
         }
     }
 }

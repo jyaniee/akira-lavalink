@@ -12,6 +12,7 @@ import dev.arbjerg.lavalink.client.loadbalancing.builtin.VoiceRegionPenaltyProvi
 import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener;
 import io.github.cdimascio.dotenv.Dotenv;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import dev.arbjerg.lavalink.client.loadbalancing.RegionGroup;
 
@@ -56,6 +57,7 @@ public class Main {
                 .addEventListeners(
                     listener
                 )
+                .setActivity(Activity.listening("Sabrina Carpenter - Espresso"))
                 .build()
                 .awaitReady();
 
