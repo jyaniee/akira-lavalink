@@ -54,7 +54,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
         final Track firstTrack = tracks.get(0);
 
-        event.getHook().sendMessage("대기열에 추가 중: " + firstTrack.getInfo().getTitle()).queue();
+        event.getHook().sendMessage("대기열에 추가되었습니다: " + firstTrack.getInfo().getTitle()).queue();
 
 
         this.mngr.scheduler.enqueue(firstTrack);

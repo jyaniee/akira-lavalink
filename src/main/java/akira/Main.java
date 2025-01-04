@@ -41,6 +41,9 @@ public class Main {
 
         client.getLoadBalancer().addPenaltyProvider(new VoiceRegionPenaltyProvider());
 
+        registerLavalinkListeners(client);
+        registerLavalinkNodes(client);
+
         listener = new CommandHandler(client);
 
         final var jda = JDABuilder.createDefault(botToken)
@@ -53,6 +56,8 @@ public class Main {
                 )
                 .build()
                 .awaitReady();
+
+
 
         client.on(WebSocketClosedEvent.class).subscribe((event) -> {
             if(event.getCode() == SESSION_INVALID){
