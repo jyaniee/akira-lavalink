@@ -72,7 +72,7 @@ public class CommandHandler extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         switch (event.getFullCommandName()){
-            case "들어가기" -> new Join().execute(event);
+            case "들어가기" -> new Join(this).execute(event);
             case "나가기" -> new Leave().execute(event);
             case "정지" -> new Stop(client, this).execute(event);
             case "재생" -> new Play(client, this).execute(event);

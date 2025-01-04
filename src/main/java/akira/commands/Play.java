@@ -35,7 +35,7 @@ public class Play {
         if(guild.getSelfMember().getVoiceState().inAudioChannel()){
             event.deferReply(false).queue();
         } else {
-            new Join().execute(event);
+            new Join(commandHandler).execute(event);
         }
 
         final long guildId = event.getGuild().getIdLong();

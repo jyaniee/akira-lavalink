@@ -1,6 +1,8 @@
 package akira.music;
 
+import dev.arbjerg.lavalink.client.player.PlaylistLoaded;
 import dev.arbjerg.lavalink.client.player.Track;
+import dev.arbjerg.lavalink.client.player.TrackLoaded;
 import dev.arbjerg.lavalink.protocol.v4.Message;
 
 import java.util.LinkedList;
@@ -55,6 +57,11 @@ public class TrackScheduler {
 
     public void onTrackStart(Track track) {
         // Your homework: Send a message to the channel somehow, have fun!
+        // ㅇㅋ 메시지 보내기 추가
+        this.guildMusicManager.getTextChannel().ifPresent(textChannel -> {
+            String message = "\uD83C\uDFB5 현재 재생 중: **" + track.getInfo().getTitle() + "**\n\uD83D\uDD17 [곡 링크](" + track.getInfo().getUri() + ")";
+            textChannel.sendMessage(message).queue();
+        });
         System.out.println("Track started: " + track.getInfo().getTitle());
     }
 
@@ -66,6 +73,29 @@ public class TrackScheduler {
             if (nextTrack != null) {
                 System.out.println("[TrackScheduler] Next track to play: " + nextTrack.getInfo().getTitle());
                 this.startTrack(nextTrack);
+            } else if ("youtube".equals(lastTrack.getInfo().getSourceName()) || "youtubemusic".equals(lastTrack.getInfo().getSourceName())) {
+                // 대기열이 비었을 때 연관 동영상 리스트 가져옴
+                String relatedVideosUrl = "https://www.youtube.com/watch?v=" + lastTrack.getInfo().getIdentifier()
+                        + "&list=RD" + lastTrack.getInfo().getIdentifier();
+                System.out.println("[TrackScheduler] 연관 동영상 검색: " + relatedVideosUrl);
+
+                this.guildMusicManager.getLink().ifPresent(link ->
+                        link.loadItem(relatedVideosUrl).subscribe(trackResult -> {
+                            if (trackResult instanceof TrackLoaded) {
+                                startTrack(((TrackLoaded) trackResult).getTrack());
+                            } else if (trackResult instanceof PlaylistLoaded) {
+                                PlaylistLoaded playlist = (PlaylistLoaded) trackResult;
+                                Track firstTrack = playlist.getTracks().stream()
+                                        .filter(t -> !t.getInfo().getIdentifier().equals(lastTrack.getInfo().getIdentifier())) // 중복 제거
+                                        .findFirst()
+                                        .orElse(null);
+
+                                if (firstTrack != null) {
+                                    startTrack(firstTrack);
+                                }
+                            }
+                        })
+                );
             }
         }
     }

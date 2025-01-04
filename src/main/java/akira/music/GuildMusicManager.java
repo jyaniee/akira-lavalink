@@ -3,6 +3,7 @@ package akira.music;
 import dev.arbjerg.lavalink.client.LavalinkClient;
 import dev.arbjerg.lavalink.client.Link;
 import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.Optional;
 
@@ -10,10 +11,19 @@ public class GuildMusicManager {
     public final TrackScheduler scheduler = new TrackScheduler(this);
     private final long guildId;
     private final LavalinkClient lavalink;
+    private TextChannel textChannel;
 
     public GuildMusicManager(long guildId, LavalinkClient lavalink) {
         this.lavalink = lavalink;
         this.guildId = guildId;
+    }
+
+    public void setTextChannel(TextChannel textChannel) {
+        this.textChannel = textChannel;
+    }
+
+    public Optional<TextChannel> getTextChannel() {
+        return Optional.ofNullable(this.textChannel);
     }
 
     public void stop() {
