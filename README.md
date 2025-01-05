@@ -1,10 +1,10 @@
 # 🎵 Akira Discord Bot
 
-Akira는 **음악 재생**, **대기열 관리**, **볼륨 조절** 등 다양한 기능을 제공하는 Discord 음악 봇입니다. Lavalink를 기반으로 제작되었으며, 음악 봇에 필수적으로 필요한 기능들이 구현되어 있습니다.
+내가 쓸려고 만드는 디스코드 음악 봇 Akira.
 
 ---
 
-## 📋 주요 기능
+## 주요 기능
 
 - **음악 재생**: YouTube, Spotify 등 다양한 플랫폼에서 음악 재생 가능. (현재 Spotify는 연동하지 않음)
 - **대기열 관리**: 곡을 추가하거나 삭제하며, 대기열을 확인하는 기능.
@@ -15,11 +15,11 @@ Akira는 **음악 재생**, **대기열 관리**, **볼륨 조절** 등 다양�
 
 ---
 
-## 🔧 설치 및 실행
+## 설치 및 실행
 
 ### 1. 필수 사항
 - **Java 17 이상**
-- [Lavalink](https://github.com/freyacodes/Lavalink) 서버
+- [Lavalink](https://github.com/freyacodes/Lavalink) 서버(로컬 또는 원격 실행)
 - Discord 봇 토큰
 
 ### 2. 환경 변수 설정
@@ -36,7 +36,7 @@ java -jar Lavalink.jar
 서버를 실행 한 뒤, 봇을 구동.
 
 
-## 📜 주요 명령어
+## 주요 명령어
 | 명령어        | 설명                                     | 예시                       |
 |---------------|----------------------------------------|----------------------------|
 | `/재생`       | 음악을 재생합니다.                      | `/재생 플랫폼:YouTube 쿼리:노래 제목` |
@@ -49,9 +49,19 @@ java -jar Lavalink.jar
 | `/안녕`       | 봇이 인사 메시지를 보냅니다.              | `/안녕`                    |
 
 
-## 💻 기술 스택
+## 기술 스택
 
 - **Java**: 17+
 - **JDA**: Discord API Wrapper
 - **Lavalink**: 고성능 음악 스트리밍 서버
 - **Maven**: 의존성 관리 및 빌드 도구
+
+## Lavalink
+Lavalink 설정 및 API 사용에 대한 자세한 내용은 아래의 공식 문서를 참조<br>
+https://client.lavalink.dev/<br>
+https://lavalink.dev/api/index.html
+
+### 사용한 플러그인
+[youtube-source](https://github.com/lavalink-devs/youtube-source)<br>
+[LavaSrc](https://github.com/topi314/LavaSrc)<br>
+[LavaSearch](https://github.com/topi314/LavaSearch)
