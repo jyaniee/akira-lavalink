@@ -22,18 +22,45 @@
 - [Lavalink](https://github.com/freyacodes/Lavalink) 서버(로컬 또는 원격 실행)
 - Discord 봇 토큰
 
-### 2. 환경 변수 설정
+### 2. 환경 변수 설정 및 종속성 설치
 `.env` 파일을 생성하고 아래 내용을 입력:
 ```env
 BOT_TOKEN=your_discord_bot_token
 ```
 
-### 3. Lavalink 서버 실행 후 봇 구동
+**Linux일 경우 exec 플러그인을 사용해 실행:**
+```bash
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.5.0</version>
+            <configuration>
+                <mainClass>패키지명.Main</mainClass> <!-- Main 클래스의 전체 경로 -->
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+```
+```bash
+mvm clean install
+```
+
+### 3. Lavalink 서버 실행
 Lavalink의 `application.yml`을 설정한 후 Lavalink 서버를 실행:
 ```bash
 java -jar Lavalink.jar
 ```
-서버를 실행 한 뒤, 봇을 구동.
+### 4-1. 봇 클라이언트 구동: Linux에서 호스팅하는 경우(원격)
+Lavalink에서 **Oauth**를 활성화 해야할 가능성이 높음. <br>
+Oauth에 관한 자세한 내용은 [youtube-soruce](https://github.com/lavalink-devs/youtube-source?tab=readme-ov-file#using-oauth-tokens) 에서 **Using OAuth Tokens** 부분 참고. <br>
+Oauth 활성화 후, **봇 클라이언트**:
+```bash
+mvn exec:java
+```
+### 4-2. 봇 클라이언트 구동: Windows에서 실행(로컬)
+IDE를 이용해서 `Main.java`를 실행하였음.
 
 
 ## 주요 명령어
