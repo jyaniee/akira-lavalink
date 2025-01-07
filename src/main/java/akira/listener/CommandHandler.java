@@ -101,14 +101,12 @@ public class CommandHandler extends ListenerAdapter {
                 //if(loadResult.getClass().getSimpleName().equals("SearchResult")){
                     //List<Track> tracks = result.getTracks();
                     //List<Track> tracks = ((dev.arbjerg.lavalink.protocol.v4.LoadResult.SearchResult) loadResult).getTracks();
-                    // 씨발 대체 어떻게 해야하는거야
                 if(LavalinkLoadResult instanceof LoadResult.SearchResult result){
                     List<dev.arbjerg.lavalink.protocol.v4.Track> tracks = result.getData().getTracks();
                     List<Command.Choice> choices = tracks.stream()
                             .limit(10)
                             .map(track -> new Command.Choice(track.getInfo().getTitle(), track.getInfo().getUri()))
                             .toList();
-                // ㅆㅂ 내가 이겼다 ㅇㅇ 이 메소드 하나 완성하는데 5시간 걸림.
                     event.replyChoices(choices).queue();
                 }else {
                     event.replyChoices().queue();
