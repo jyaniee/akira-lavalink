@@ -38,6 +38,23 @@ public class Main {
             return;
         }
 
+        String lavalinkHost = dotenv.get("LAVALINK_HOST");
+        String lavalinkPort = dotenv.get("LAVALINK_PORT");
+        String lavalinkPwd = dotenv.get("LAVALINK_PASSWORD");
+        LOG.info("HOST: {}", lavalinkHost);
+        LOG.info("PORT: {}", lavalinkPort);
+        LOG.info("PWD: {}", lavalinkPwd);
+
+
+        if(
+                lavalinkHost == null || lavalinkHost.isBlank() ||
+                lavalinkPort == null || lavalinkPort.isBlank() ||
+                lavalinkPwd == null || lavalinkPwd.isBlank()
+        ){
+            LOG.error("Lavalink 설정이 누락되었습니다.");
+            return;
+        }
+
         LavalinkClient client = new LavalinkClient(
                 Helpers.getUserIdFromToken(botToken)
         );
@@ -45,7 +62,7 @@ public class Main {
         client.getLoadBalancer().addPenaltyProvider(new VoiceRegionPenaltyProvider());
 
         registerLavalinkListeners(client);
-        registerLavalinkNodes(client);
+        registerLavalinkNodes(client, lavalinkHost, lavalinkPort, lavalinkPwd);
 
         listener = new CommandHandler(client);
 
@@ -57,7 +74,7 @@ public class Main {
                 .addEventListeners(
                     listener
                 )
-                .setActivity(Activity.listening("Sabrina Carpenter - Espresso"))
+                .setActivity(Activity.listening("tuki. - ひゅるりらぱっぱ"))
                 .build()
                 .awaitReady();
 
@@ -84,7 +101,7 @@ public class Main {
 
     }
 
-    private static void registerLavalinkNodes(LavalinkClient client) {
+    private static void registerLavalinkNodes(LavalinkClient client, String lavalinkHost, String lavalinkPort, String lavalinkPwd) {
         List.of(
 //            client.addNode(
 //                new NodeOptions.Builder()
@@ -103,9 +120,9 @@ public class Main {
 //
                 client.addNode(
                         new NodeOptions.Builder()
-                                .setName("localhost")
-                                .setServerUri("ws://localhost")
-                                .setPassword("0507")
+                                .setName("Lavalink-Node")
+                                .setServerUri("ws://" + lavalinkHost + ":" + lavalinkPort)
+                                .setPassword(lavalinkPwd)
                                 .setRegionFilter(RegionGroup.ASIA)
                                 .build()
                 )
