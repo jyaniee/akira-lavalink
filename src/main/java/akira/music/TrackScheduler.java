@@ -18,6 +18,8 @@ public class TrackScheduler {
     // 이미 재생한 트랙의 식별자 저장
     private final Set<String> playedTrackIds = new HashSet<>();
 
+    private static final long AUTO_PLAY_REQUESTER_ID = 0L;
+
     public TrackScheduler(GuildMusicManager guildMusicManager) {
         this.guildMusicManager = guildMusicManager;
     }
@@ -75,7 +77,10 @@ public class TrackScheduler {
                     (durationMs / 1000) % 60  // 초
             );
             embed.addField("곡 길이", formattedDuration, true); // 인라인 필드
-            embed.addField("요청자", "<@" + track.getUserData(MyUserData.class).requester() + ">", false);
+
+           long requesterId = track.getUserData(MyUserData.class).requester();
+           String requesterText = requesterId == 0L ? "Akira \uD83E\uDD16" : "<@" + requesterId + ">";
+            embed.addField("요청자", requesterText, false);
 
             String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             embed.setFooter("• " + currentTime, null);
@@ -143,6 +148,10 @@ public class TrackScheduler {
     }
 
     public void startTrack(Track track) {
+        if(track.getUserData().isEmpty()){
+            track.setUserData(new MyUserData(AUTO_PLAY_REQUESTER_ID));
+        }
+
         // 재생할 때마다 Set에 트랙 ID 저장
         playedTrackIds.add(track.getInfo().getIdentifier());
         this.guildMusicManager.getLink().ifPresent(

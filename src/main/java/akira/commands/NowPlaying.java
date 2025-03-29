@@ -68,13 +68,16 @@ public class NowPlaying {
 
         */
 
+        long requesterId = track.getUserData(MyUserData.class).requester();
+        String requesterText = (requesterId == 0L) ? "Akira \uD83E\uDD16" : "<@" + requesterId + ">";
+
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("🎵 현재 재생 중: " + trackInfo.getTitle(), trackInfo.getUri());
         embed.setDescription("**재생 시간:** `%s / %s`".formatted(currentTime, trackLength));
         embed.setColor(0x1DB954);
         embed.setThumbnail("https://img.youtube.com/vi/" + trackInfo.getIdentifier() + "/hqdefault.jpg"); // 썸네일 이미지
-        embed.addField("요청자", "<@" + track.getUserData(MyUserData.class).requester() + ">", false);
-
+        // embed.addField("요청자", "<@" + track.getUserData(MyUserData.class).requester() + ">", false);
+        embed.addField("요청자", requesterText, false);
         event.replyEmbeds(embed.build()).queue();
     }
 }
