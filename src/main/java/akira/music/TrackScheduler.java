@@ -8,14 +8,15 @@ import dev.arbjerg.lavalink.protocol.v4.Message;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.time.format.DateTimeFormatter;
 
 public class TrackScheduler {
     private final GuildMusicManager guildMusicManager;
     public final Queue<Track> queue = new LinkedList<>();
+
+    // 이미 재생한 트랙의 식별자 저장
+    private final Set<String> playedTrackIds = new HashSet<>();
 
     public TrackScheduler(GuildMusicManager guildMusicManager) {
         this.guildMusicManager = guildMusicManager;
@@ -91,6 +92,10 @@ public class TrackScheduler {
     public void onTrackEnd(Track lastTrack, Message.EmittedEvent.TrackEndEvent.AudioTrackEndReason endReason) {
         if (endReason.getMayStartNext()) {
             System.out.println("[TrackScheduler] Track ended: " + lastTrack.getInfo().getTitle());
+
+            // 방금 끝난 트랙 ID 추가
+            playedTrackIds.add(lastTrack.getInfo().getIdentifier());
+
             final var nextTrack = this.queue.poll();
 
             if (nextTrack != null) {
@@ -104,10 +109,23 @@ public class TrackScheduler {
 
                 this.guildMusicManager.getLink().ifPresent(link ->
                         link.loadItem(relatedVideosUrl).subscribe(trackResult -> {
-                            if (trackResult instanceof TrackLoaded) {
-                                startTrack(((TrackLoaded) trackResult).getTrack());
-                            } else if (trackResult instanceof PlaylistLoaded) {
-                                PlaylistLoaded playlist = (PlaylistLoaded) trackResult;
+                            if (trackResult instanceof TrackLoaded trackLoaded) {
+                                Track newTrack = trackLoaded.getTrack();
+                                if(!playedTrackIds.contains(newTrack.getInfo().getIdentifier())) {
+                                    startTrack(newTrack);
+                                }else{
+                                    System.out.println("[TrackScheduler] 로드된 단일 트랙이 중복되어 무시됨: " + newTrack.getInfo().getTitle());
+                                }
+                               // startTrack(((TrackLoaded) trackResult).getTrack());
+                            } else if (trackResult instanceof PlaylistLoaded playlistLoaded) {
+                                playlistLoaded.getTracks().stream()
+                                        .filter(track -> !playedTrackIds.contains(track.getInfo().getIdentifier()))
+                                        .findFirst()
+                                        .ifPresentOrElse(
+                                                this::startTrack,
+                                                () -> System.out.println("[TrackScheduler] 중복되지 않은 트랙을 찾을 수 없습니다.")
+                                        );
+                                /* PlaylistLoaded playlist = (PlaylistLoaded) trackResult;
                                 Track firstTrack = playlist.getTracks().stream()
                                         .filter(t -> !t.getInfo().getIdentifier().equals(lastTrack.getInfo().getIdentifier())) // 중복 제거
                                         .findFirst()
@@ -116,6 +134,7 @@ public class TrackScheduler {
                                 if (firstTrack != null) {
                                     startTrack(firstTrack);
                                 }
+                                 */
                             }
                         })
                 );
@@ -124,6 +143,8 @@ public class TrackScheduler {
     }
 
     public void startTrack(Track track) {
+        // 재생할 때마다 Set에 트랙 ID 저장
+        playedTrackIds.add(track.getInfo().getIdentifier());
         this.guildMusicManager.getLink().ifPresent(
                 (link) -> link.createOrUpdatePlayer()
                         .setTrack(track)
