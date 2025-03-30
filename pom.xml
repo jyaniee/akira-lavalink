@@ -91,7 +91,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>akira.main</mainClass>
+                    <mainClass>akira.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
