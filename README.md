@@ -25,6 +25,9 @@ Java 기반 Lavalink를 활용한 디스코드 음악 봇, **아키라**입니�
 `.env` 파일을 생성하고 아래 내용을 입력:
 ```env
 BOT_TOKEN=your_discord_bot_token
+LAVALINK_HOST=your_server_host
+LAVALINK_PORT=2333
+LAVALINK_PASSWORD=your_server_password
 ```
 
 **Linux일 경우 exec 플러그인을 사용해 실행:**
