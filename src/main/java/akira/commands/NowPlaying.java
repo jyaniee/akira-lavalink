@@ -68,9 +68,18 @@ public class NowPlaying {
 
         */
 
-        long requesterId = track.getUserData(MyUserData.class).requester();
+        MyUserData userData = track.getUserData(MyUserData.class);
+        long requesterId = track.getUserData(MyUserData.class).getRequesterId();
         long botId = event.getJDA().getSelfUser().getIdLong();
-        String requesterText = (requesterId == 0L) ? "<@" + botId + ">" : "<@" + requesterId + ">";
+        String sourceType = userData.getSourceType();
+
+        String requesterText;
+        switch (sourceType) {
+            case "jpop" -> requesterText = "`JPOP 리스트` (by <@" + requesterId + ">)";
+            case "autoplay" -> requesterText = "<@" + botId + ">";
+            default -> requesterText = "<@" + requesterId + ">";
+        }
+
         EmbedBuilder embed = new EmbedBuilder();
         embed.setTitle("🎵 현재 재생 중: " + trackInfo.getTitle(), trackInfo.getUri());
         embed.setDescription("**재생 시간:** `%s / %s`".formatted(currentTime, trackLength));

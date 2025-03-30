@@ -142,21 +142,25 @@ public class DeveloperJpopList {
             hook.sendMessage("🎶 JPOP 플레이리스트를 대기열에 추가하고 있어요... 잠시만 기다려 주세요!").queue(loadingMsg -> {
                 final int total = playlist.size();
                 final int[] completed = {0};
+                final long botId = event.getJDA().getSelfUser().getIdLong();
 
                 for (String searchQuery : playlist){
-                    link.loadItem(searchQuery).subscribe(new AudioLoader(event, musicManager, true, () -> {
-                        completed[0]++;
-                        if(completed[0] == total){
-                            EmbedBuilder embed = new EmbedBuilder();
-                            embed.setTitle("🌸 개발자의 JPOP 플레이리스트")
-                                    .setDescription("총 " + total + "곡이 모두 성공적으로 대기열에 추가되었습니다!")
-                                    .setThumbnail("https://mosaic.scdn.co/300/ab67616d00001e024fa36b14a276fe560940baa0ab67616d00001e0264c8b41faf576a0bab551fb9ab67616d00001e027e1eeb0d7cc374a168369c80ab67616d00001e028679d61504ed4718bf5f94ae")
-                                    .setColor(0xFFC0CB)
-                                    .setFooter("Made by " + event.getUser().getName(), event.getUser().getAvatarUrl());
+                    link.loadItem(searchQuery).subscribe(new AudioLoader(
+                            event,
+                            musicManager,
+                            true, () -> {
+                                completed[0]++;
+                                if(completed[0] == total){
+                                    EmbedBuilder embed = new EmbedBuilder();
+                                    embed.setTitle("🌸 개발자의 JPOP 플레이리스트")
+                                            .setDescription("총 " + total + "곡이 모두 성공적으로 대기열에 추가되었습니다!")
+                                            .setThumbnail("https://mosaic.scdn.co/300/ab67616d00001e024fa36b14a276fe560940baa0ab67616d00001e0264c8b41faf576a0bab551fb9ab67616d00001e027e1eeb0d7cc374a168369c80ab67616d00001e028679d61504ed4718bf5f94ae")
+                                            .setColor(0xFFC0CB)
+                                            .setFooter("Made by " + event.getUser().getName(), event.getUser().getAvatarUrl());
 
-                            loadingMsg.editMessageEmbeds(embed.build()).queue();
+                                    loadingMsg.editMessageEmbeds(embed.build()).queue();
                         }
-                    }));
+                    }, botId, true));
                 }
             });
         });

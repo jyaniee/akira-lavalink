@@ -9,6 +9,8 @@ import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.internal.LavalinkRestClient;
 import dev.arbjerg.lavalink.protocol.v4.LoadResult;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
@@ -134,8 +137,49 @@ public class CommandHandler extends ListenerAdapter {
         }
     }
 
+    @Override
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        var guild = event.getGuild();
+        if (guild == null) return;
+
+        long guildId = guild.getIdLong();
+        String userKey = event.getUser().getId() + ":" + guildId;
+        int currentPage = Queue.userPageMap.getOrDefault(userKey, 1);
+
+        GuildMusicManager musicManager = getOrCreateMusicManager(guildId);
+        var scheduler = musicManager.scheduler;
+        int totalPages = (int) Math.ceil((double) scheduler.queue.size() / 10);
+
+        if (event.getComponentId().equals("queue_next")) {
+            currentPage = Math.min(currentPage + 1, totalPages);
+        } else if (event.getComponentId().equals("queue_prev")) {
+            currentPage = Math.max(currentPage - 1, 1);
+        }
+
+        Queue.userPageMap.put(userKey, currentPage);
+        var embed = new Queue(client, this).buildQueueEmbed(scheduler.queue, currentPage);
+
+        // ⬅️ 이전, ➡️ 다음 버튼 상태 지정
+        boolean isFirst = currentPage == 1;
+        boolean isLast = currentPage == totalPages;
+        Button prev = Button.primary("queue_prev", "⬅ 이전").withDisabled(isFirst);
+        Button next = Button.primary("queue_next", "다음 ➡").withDisabled(isLast);
+
+        try {
+            event.editMessageEmbeds(embed.build())
+                    .setActionRow(prev, next)
+                    .queue(
+                            null,
+                            error -> LOG.warn("버튼 응답 실패: {}", error.getMessage())
+                    );
+        } catch (Exception e) {
+            LOG.error("버튼 클릭 처리 중 예외 발생: {}", e.getMessage());
+        }
+    }
+
     public GuildMusicManager getOrCreateMusicManager(long guildId) {
         return this.musicManagers.computeIfAbsent(guildId, id -> new GuildMusicManager(id, client));
     }
+
 
 }

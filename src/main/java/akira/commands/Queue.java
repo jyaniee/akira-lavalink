@@ -4,16 +4,22 @@ import akira.MyUserData;
 import akira.listener.CommandHandler;
 import akira.music.GuildMusicManager;
 import dev.arbjerg.lavalink.client.LavalinkClient;
+import dev.arbjerg.lavalink.client.player.Track;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import akira.music.TrackScheduler;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Queue {
     private final LavalinkClient client;
     private final CommandHandler commandHandler;
+    public static final Map<String, Integer> userPageMap = new HashMap<>();
 
     public Queue(LavalinkClient client, CommandHandler commandHandler) {
         this.client = client;
@@ -22,7 +28,7 @@ public class Queue {
 
     public void execute(SlashCommandInteractionEvent event) {
         var guild = event.getGuild();
-        if(guild == null){
+        if (guild == null) {
             return;
         }
 
@@ -31,7 +37,7 @@ public class Queue {
 
         TrackScheduler scheduler = musicManager.scheduler;
 
-        if(scheduler.queue.isEmpty()){
+        if (scheduler.queue.isEmpty()) {
             // event.reply("현재 대기열이 비어 있습니다!").queue();
             EmbedBuilder emptyEmbed = new EmbedBuilder();
             emptyEmbed.setTitle("🎵 대기열이 비어 있습니다!");
@@ -41,6 +47,17 @@ public class Queue {
             return;
         }
 
+        String userKey = event.getUser().getId() + ":" + guildId;
+        userPageMap.put(userKey, 1);
+
+        var embed = buildQueueEmbed(scheduler.queue, 1);
+        event.replyEmbeds(embed.build())
+                .addActionRow(
+                        Button.primary("queue_prev", "⬅ 이전"),
+                        Button.primary("queue_next", "다음 ➡")
+                ).queue();
+    }
+    /*
         // 대기열 트랙 정보 가져옴
         List<String> trackList = scheduler.queue.stream()
                 .limit(10)
@@ -62,6 +79,44 @@ public class Queue {
         System.out.println("[Queue Command] Current queue:\n" + queueMessage);
 
         // event.reply("현재 대기열:\n" + queueMessage).queue();
+
+     */
+
+    public EmbedBuilder buildQueueEmbed(java.util.Queue<Track> queue, int page) {
+        int itemsPerPage = 10;
+        int totalTracks = queue.size();
+        int totalPages = (int) Math.ceil((double) totalTracks / itemsPerPage);
+
+        page = Math.max(1, Math.min(page, totalPages));
+        List<Track> tracks = queue.stream().toList();
+        int start = (page - 1) * itemsPerPage;
+        int end = Math.min(start + itemsPerPage, totalTracks);
+
+        List<String> trackList = new ArrayList<>();
+        for (int i = start; i < end; i++) {
+            Track track = tracks.get(i);
+            MyUserData userData = track.getUserData(MyUserData.class);
+            long requesterId = userData.getRequesterId();
+            String sourceType = userData.getSourceType();
+
+            String requesterText;
+            switch (sourceType) {
+                case "jpop" -> requesterText = "`JPOP 리스트` (by <@" + requesterId + ">)";
+                default     -> requesterText = "<@" + requesterId + ">";
+            }
+
+            trackList.add(String.format("%d. 🎵 %s — %s",
+                    i + 1,
+                    track.getInfo().getTitle(),
+                    requesterText));
+        }
+
+        EmbedBuilder embed = new EmbedBuilder();
+        embed.setTitle("🎶 현재 대기열");
+        embed.setDescription(String.join("\n", trackList));
+        embed.setFooter("페이지 %d/%d | 총 %d곡".formatted(page, totalPages, totalTracks), null);
+        embed.setColor(0x1DB954);
+        return embed;
     }
 /*
     private GuildMusicManager getOrCreateMusicManager(long guildId) {

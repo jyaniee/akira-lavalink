@@ -15,28 +15,70 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
     private final GuildMusicManager mngr;
     private final boolean silent;
     private final Runnable onTrackLoadedCallback;
+    private final Long requesterOverrideId;
+    private final boolean isExplicitJpopListRequest;
+
     public AudioLoader(SlashCommandInteractionEvent event, GuildMusicManager mngr, boolean silent, Runnable onTrackLoadedCallback) {
         this.event = event;
         this.mngr = mngr;
         this.silent = silent;
         this.onTrackLoadedCallback = onTrackLoadedCallback;
+        this.requesterOverrideId = null;
+        this.isExplicitJpopListRequest = false;
     }
+
+    // 기본 생성자 (일반 재생 명령어)
     public AudioLoader(SlashCommandInteractionEvent event, GuildMusicManager mngr) {
-        this(event, mngr, false, null);
+        this(event, mngr, false, null, null, false);
+    }
+    
+    // silent,  callback 생성자
+    public AudioLoader(SlashCommandInteractionEvent event, GuildMusicManager mngr, boolean silent, Runnable onTrackLoadedCallback, Long requesterOverrideId) {
+        this.event = event;
+        this.mngr = mngr;
+        this.silent = silent;
+        this.onTrackLoadedCallback = onTrackLoadedCallback;
+        this.requesterOverrideId = requesterOverrideId;
+        this.isExplicitJpopListRequest = false;
+    }
+    
+    // 봇 요청 여부, 사용자 지정
+    public AudioLoader(SlashCommandInteractionEvent event, GuildMusicManager mngr, boolean silent, Runnable onTrackLoadedCallback, Long requesterOverrideId, boolean isExplicitJpopListRequest) {
+        this.event = event;
+        this.mngr = mngr;
+        this.silent = silent;
+        this.onTrackLoadedCallback = onTrackLoadedCallback;
+        this.requesterOverrideId = requesterOverrideId;
+        this.isExplicitJpopListRequest = isExplicitJpopListRequest;
+    }
+
+    private String formatRequesterText(long requesterId) {
+        if (requesterOverrideId != null && isExplicitJpopListRequest) {
+            return "`JPOP 리스트` (by <@" + requesterId + ">)";
+        } else {
+            return "<@" + requesterId + ">";
+        }
     }
 
     @Override
     public void ontrackLoaded(@NotNull TrackLoaded result) {
         final Track track = result.getTrack();
-        var userData = new MyUserData(event.getUser().getIdLong());
-        track.setUserData(userData);
+        long requesterId = (requesterOverrideId != null) ? requesterOverrideId : event.getUser().getIdLong();
+        // var userData = new MyUserData(event.getUser().getIdLong());
+        String sourceType = (requesterOverrideId != null)
+                ? (isExplicitJpopListRequest ? "jpop" : "autoplay")
+                : "user";
+
+        track.setUserData(new MyUserData(requesterId, sourceType));
+
         System.out.println("[AudioLoader] Adding track to queue: " + track.getInfo().getTitle());
         this.mngr.scheduler.enqueue(track);
 
         final var trackTitle = track.getInfo().getTitle();
 
         if(!silent) {
-            event.getHook().sendMessage("대기열에 추가되었습니다: " + trackTitle + "\n요청자: <@" + userData.requester() + '>').queue();
+            String requesterText = formatRequesterText(requesterId);
+            event.getHook().sendMessage("대기열에 추가되었습니다: " + trackTitle + "\n요청자: " + requesterText).queue();
         }
         if(onTrackLoadedCallback != null) {
             onTrackLoadedCallback.run();
@@ -45,6 +87,14 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void onPlaylistLoaded(@NotNull PlaylistLoaded result) {
+        long requesterId = (requesterOverrideId != null) ? requesterOverrideId : event.getUser().getIdLong();
+        String sourceType = (requesterOverrideId != null)
+                ? (isExplicitJpopListRequest ? "jpop" : "autoplay")
+                : "user";
+
+        for(Track track : result.getTracks()) {
+            track.setUserData(new MyUserData(requesterId, sourceType));
+        }
         final int trackCount = result.getTracks().size();
         this.mngr.scheduler.enqueuePlaylist(result.getTracks());
         if(!silent) {
@@ -68,9 +118,19 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
         final Track firstTrack = tracks.get(0);
 
+        long requesterId = (requesterOverrideId != null) ? requesterOverrideId : event.getUser().getIdLong();
+        String sourceType = (requesterOverrideId != null)
+                ? (isExplicitJpopListRequest ? "jpop" : "autoplay")
+                : "user";
+
+        firstTrack.setUserData(new MyUserData(requesterId, sourceType));
         this.mngr.scheduler.enqueue(firstTrack);
-        if(!silent) {
-            event.getHook().sendMessage("대기열에 추가되었습니다: " + firstTrack.getInfo().getTitle()).queue();
+
+
+        if (!silent) {
+            String requesterText = formatRequesterText(requesterId);
+            event.getHook().sendMessage("대기열에 추가되었습니다: " + firstTrack.getInfo().getTitle()
+                    + "\n요청자: " + requesterText).queue();
         }
 
         if(onTrackLoadedCallback != null) {

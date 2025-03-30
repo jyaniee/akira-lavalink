@@ -6,7 +6,7 @@ import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.client.player.TrackLoaded;
 import dev.arbjerg.lavalink.protocol.v4.Message;
 import net.dv8tion.jda.api.EmbedBuilder;
-
+import akira.MyUserData;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.time.format.DateTimeFormatter;
@@ -78,9 +78,16 @@ public class TrackScheduler {
             );
             embed.addField("곡 길이", formattedDuration, true); // 인라인 필드
 
-            long requesterId = track.getUserData(MyUserData.class).requester();
+            long requesterId = track.getUserData(MyUserData.class).getRequesterId();
             long botId = textChannel.getJDA().getSelfUser().getIdLong();
-            String requesterText = requesterId == 0L ? "<@" + botId + ">" : "<@" + requesterId + ">";
+            MyUserData userData = track.getUserData(MyUserData.class);
+            String sourceType = userData.getSourceType();
+            String requesterText;
+            switch (sourceType) {
+                case "jpop" -> requesterText = "`JPOP 리스트` (by <@" + requesterId + ">)";
+                case "autoplay" -> requesterText = "<@" + botId + ">";
+                default -> requesterText = "<@" + requesterId + ">";
+            }
             embed.addField("요청자", requesterText, false);
 
             String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -150,7 +157,7 @@ public class TrackScheduler {
 
     public void startTrack(Track track) {
         if(track.getUserData().isEmpty()){
-            track.setUserData(new MyUserData(AUTO_PLAY_REQUESTER_ID));
+            track.setUserData(new MyUserData(AUTO_PLAY_REQUESTER_ID, "autoplay"));
         }
 
         // 재생할 때마다 Set에 트랙 ID 저장
