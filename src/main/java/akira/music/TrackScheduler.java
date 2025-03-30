@@ -20,6 +20,8 @@ public class TrackScheduler {
 
     private static final long AUTO_PLAY_REQUESTER_ID = 0L;
 
+    private boolean firstTrackQueued = false;
+
     public TrackScheduler(GuildMusicManager guildMusicManager) {
         this.guildMusicManager = guildMusicManager;
     }
@@ -29,21 +31,19 @@ public class TrackScheduler {
         System.out.println("[TrackScheduler] Current queue size: " + this.queue.size());
 
 
-        this.guildMusicManager.getPlayer().ifPresentOrElse(
-                (player) -> {
-                    if (player.getTrack() == null) {
-                        System.out.println("[TrackScheduler] No track is currently playing. Starting track: " + track.getInfo().getTitle());
-                        this.startTrack(track);
-                    } else {
-                        System.out.println("[TrackScheduler] Adding to queue: " + track.getInfo().getTitle());
-                        this.queue.offer(track);
-                    }
-                },
-                () -> {
-                    System.out.println("[TrackScheduler] Player not found, starting track immediately: " + track.getInfo().getTitle());
-                    this.startTrack(track);
-                }
-        );
+        synchronized (this) {
+            if (!firstTrackQueued) {
+                // 첫 트랙은 바로 재생
+                System.out.println("[TrackScheduler] First track, start immediately: " + track.getInfo().getTitle());
+                this.startTrack(track);
+                firstTrackQueued = true;
+            } else {
+                // 나머지는 큐에 넣음
+                System.out.println("[TrackScheduler] Queueing track: " + track.getInfo().getTitle());
+                this.queue.offer(track);
+            }
+        }
+
         System.out.println("[TrackScheduler] Queue size after enqueue: " + this.queue.size());
     }
 
@@ -161,5 +161,10 @@ public class TrackScheduler {
                         .setVolume(35)
                         .subscribe()
         );
+    }
+
+    public void reset()  {
+        this.queue.clear();
+        this.firstTrackQueued = false;
     }
 }
