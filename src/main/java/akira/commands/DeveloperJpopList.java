@@ -119,6 +119,19 @@ public class DeveloperJpopList {
         var guild = event.getGuild();
         if (guild == null) return;
 
+        // 음성 채널 감지
+        var member = event.getMember();
+        var memberVoiceState = member.getVoiceState();
+
+        if(memberVoiceState == null || !memberVoiceState.inAudioChannel()){
+            event.reply("먼저 음성 채널에 들어가주세요!").setEphemeral(true).queue();
+            return;
+        }
+
+        if(!guild.getSelfMember().getVoiceState().inAudioChannel()){
+            event.getJDA().getDirectAudioController().connect(memberVoiceState.getChannel());
+        }
+
         long guildId = guild.getIdLong();
         GuildMusicManager musicManager = commandHandler.getOrCreateMusicManager(guildId);
         Link link = client.getOrCreateLink(guildId);
