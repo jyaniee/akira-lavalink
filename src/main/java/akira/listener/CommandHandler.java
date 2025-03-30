@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,11 @@ public class CommandHandler extends ListenerAdapter {
                                 ),
                         Commands.slash("재한바보", "어디 한 번 해보쇼."),
                         Commands.slash("안녕", "간단한 인사를 합니다."),
-                        Commands.slash("대기열", "현재 대기열을 표시합니다."),
+                        Commands.slash("대기열", "대기열 관련 명령어입니다.")
+                                .addSubcommands(
+                                        new SubcommandData("목록", "현재 대기열을 표시합니다."),
+                                        new SubcommandData("초기화", "현재 대기열을 초기화합니다.")
+                                ),
                         Commands.slash("볼륨", "음악 볼륨을 조정합니다.")
                                 .addOption(OptionType.INTEGER, "볼륨", "설정할 볼륨 값 (0 ~ 100)", true),
                         Commands.slash("스킵", "현재 재생 중인 곡을 스킵합니다."),
@@ -72,7 +77,9 @@ public class CommandHandler extends ListenerAdapter {
     }
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        switch (event.getFullCommandName()){
+        String name = event.getName();
+        String sub = event.getSubcommandName();
+        switch (name){
             case "들어가기" -> new Join(this).execute(event);
             case "나가기" -> new Leave(this).execute(event);
             case "정지" -> new Stop(client, this).execute(event);
@@ -82,7 +89,16 @@ public class CommandHandler extends ListenerAdapter {
           //  case "lava-search" -> new LavaSearchCommand(client).execute(event);
             case "재한바보" -> new Babo().execute(event);
             case "안녕" -> new Hello().sayHello(event);
-            case "대기열" -> new Queue(client, this).execute(event);
+            case "대기열" -> {
+                if (sub == null) {
+                    new Queue(client, this).execute(event);
+                } else {
+                    switch (sub) {
+                        case "목록" -> new Queue(client, this).execute(event);
+                        case "초기화" -> new ClearQueue(this).execute(event);
+                    }
+                }
+            }
             case "볼륨" -> new Volume(client, this).execute(event);
             case "스킵" -> new Skip(client, this).execute(event);
             case "jpoplist" -> new DeveloperJpopList(client, this).execute(event);
