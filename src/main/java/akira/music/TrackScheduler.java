@@ -78,8 +78,9 @@ public class TrackScheduler {
             );
             embed.addField("곡 길이", formattedDuration, true); // 인라인 필드
 
-           long requesterId = track.getUserData(MyUserData.class).requester();
-           String requesterText = requesterId == 0L ? "Akira \uD83E\uDD16" : "<@" + requesterId + ">";
+            long requesterId = track.getUserData(MyUserData.class).requester();
+            long botId = textChannel.getJDA().getSelfUser().getIdLong();
+            String requesterText = requesterId == 0L ? "<@" + botId + ">" : "<@" + requesterId + ">";
             embed.addField("요청자", requesterText, false);
 
             String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
