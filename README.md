@@ -104,6 +104,10 @@ https://lavalink.dev/api/index.html
 [LavaSrc](https://github.com/topi314/LavaSrc)<br>
 [LavaSearch](https://github.com/topi314/LavaSearch)
 
+**youtube-source 관련 오류 해결 과정 기록**  
+youtube-source 플러그인 사용 중 발생한 `tce variant n function` 오류에 대한  
+해결 과정을 노션에 문서화해두었습니다.
+[Failed to find the tce variant n function(1.13.0)](https://www.notion.so/Lavalink-YouTube-Plugin-1-13-1-1e563cee74b480df987afab8a2a10f10)
 
 ## 참고 및 감사 인사
 - 프로젝트 개발 초기에 방향 설정에 있어 도움을 주신 뽀삐 봇 개발자 [@siy-uuu](https://github.com/siy-uuu)님께 감사드립니다.<br>

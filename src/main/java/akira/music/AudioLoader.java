@@ -62,6 +62,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void ontrackLoaded(@NotNull TrackLoaded result) {
+        System.out.println("[AudioLoader] ontrackLoaded 호출됨");
         final Track track = result.getTrack();
         long requesterId = (requesterOverrideId != null) ? requesterOverrideId : event.getUser().getIdLong();
         // var userData = new MyUserData(event.getUser().getIdLong());
@@ -87,6 +88,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void onPlaylistLoaded(@NotNull PlaylistLoaded result) {
+        System.out.println("[AudioLoader] onPlaylistLoaded 호출됨. 트랙 수: " + result.getTracks().size());
         long requesterId = (requesterOverrideId != null) ? requesterOverrideId : event.getUser().getIdLong();
         String sourceType = (requesterOverrideId != null)
                 ? (isExplicitJpopListRequest ? "jpop" : "autoplay")
@@ -109,6 +111,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void onSearchResultLoaded(@NotNull SearchResult result) {
+        System.out.println("[AudioLoader] onSearchResultLoaded 호출됨. 트랙 수: " + result.getTracks().size());
         final List<Track> tracks = result.getTracks();
 
         if (tracks.isEmpty()) {
@@ -140,6 +143,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void noMatches() {
+        System.out.println("[AudioLoader] noMatches 호출됨");
         if(!silent) {
             event.getHook().sendMessage("입력한 내용과 일치하는 항목이 없습니다!").queue();
         }
@@ -151,6 +155,7 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
 
     @Override
     public void loadFailed(@NotNull LoadFailed result) {
+        System.out.println("[AudioLoader] loadFailed 호출됨: " + result.getException().getMessage());
         if(!silent) {
             event.getHook().sendMessage("트랙을 불러오지 못했습니다! 오류: " + result.getException().getMessage()).queue();
         }

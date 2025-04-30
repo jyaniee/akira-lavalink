@@ -33,8 +33,11 @@ public class Play {
         String source = event.getOption("플랫폼").getAsString();
 
         if(guild.getSelfMember().getVoiceState().inAudioChannel()){
+            System.out.println("[Play] 사용자 음성 채널 있음. deferReply() 호출");
             event.deferReply(false).queue();
+            System.out.println("[Play] deferReply 완료. 트랙 로드 시도 시작");
         } else {
+            System.out.println("[Play] 사용자 음성 채널 없음. Join 실행");
             new Join(commandHandler).execute(event);
         }
 
@@ -44,11 +47,15 @@ public class Play {
 
         if(isValidURI(identifier)){
             // URI일 경우
+            System.out.println("[Play] 유효한 URI 감지됨: " + identifier);
             link.loadItem(identifier).subscribe(new AudioLoader(event, mngr));
+            System.out.println("[Play] link.loadItem(identifier) 호출 완료");
         } else {
             // 제목일 경우
             String searchQuery = source + ":" + identifier; // "ytsearch:노래제목"
+            System.out.println("[Play] 검색 쿼리 생성됨: " + searchQuery);
             link.loadItem(searchQuery).subscribe(new AudioLoader(event, mngr));
+            System.out.println("[Play] link.loadItem(searchQuery) 호출 완료");
         }
 
     }
