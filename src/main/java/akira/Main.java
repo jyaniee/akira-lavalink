@@ -74,7 +74,7 @@ public class Main {
                 .addEventListeners(
                     listener
                 )
-                .setActivity(Activity.listening("tuki. - ひゅるりらぱっぱ"))
+                .setActivity(Activity.listening("tuki. - 地獄恋文"))
                 .build()
                 .awaitReady();
 
