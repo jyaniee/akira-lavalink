@@ -1,6 +1,7 @@
 package akira.riot;
 
 import akira.riot.dto.AccountDto;
+import akira.riot.dto.ChampionMasteryDto;
 import akira.riot.dto.LeagueEntryDto;
 import akira.riot.dto.SummonerDto;
 import com.google.gson.reflect.TypeToken;
@@ -82,6 +83,26 @@ public class RiotApiClient {
             checkResponse(response);
             Type listType = new TypeToken<List<LeagueEntryDto>>(){}.getType();
             return gson.fromJson(response.body().charStream(), listType);
+        }
+    }
+
+    public ChampionMasteryDto getTopChampionMasteryByPuuid(String puuid) throws IOException {
+        String url = String.format(
+                "https://kr.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/%s?api_key=%s",
+                puuid, RIOT_API_KEY
+        );
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            checkResponse(response);
+
+            Type listType = new TypeToken<List<ChampionMasteryDto>>(){}.getType();
+            List<ChampionMasteryDto> masteryList = gson.fromJson(response.body().charStream(), listType);
+
+            return masteryList.isEmpty() ? null : masteryList.get(0);
         }
     }
 

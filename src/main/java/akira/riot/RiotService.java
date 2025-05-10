@@ -1,8 +1,10 @@
 package akira.riot;
 
 import akira.riot.dto.AccountDto;
+import akira.riot.dto.ChampionMasteryDto;
 import akira.riot.dto.LeagueEntryDto;
 import akira.riot.dto.SummonerDto;
+import akira.util.ChampionNameMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +26,7 @@ public class RiotService {
         AccountDto account = apiClient.getAccountByRiotId(gameName, tagLine);
         SummonerDto summoner = apiClient.getSummonerByPuuid(account.puuid);
         List<LeagueEntryDto> ranks = apiClient.getLeagueEntriesByPuuid(account.puuid);
+        ChampionMasteryDto topMastery = apiClient.getTopChampionMasteryByPuuid(account.puuid);
 
         Optional<LeagueEntryDto> solo = ranks.stream()
                 .filter(r -> r.queueType.equals("RANKED_SOLO_5x5"))
@@ -32,6 +35,12 @@ public class RiotService {
         Optional<LeagueEntryDto> flex = ranks.stream()
                 .filter(r -> r.queueType.equals("RANKED_FLEX_SR"))
                 .findFirst();
+
+        String mostChampionName = topMastery != null
+                ? ChampionNameMapper.getChampionName(topMastery.championId)
+                : "없음";
+
+        int mostChampionPoints = topMastery != null ? topMastery.championPoints : 0;
 
         return new PlayerInfo(
                 summoner.id,
@@ -44,7 +53,10 @@ public class RiotService {
                 flex.map(r -> r.leaguePoints).orElse(0),
                 flex.map(r -> r.wins).orElse(0),
                 flex.map(r -> r.losses).orElse(0),
-                summoner.profileIconId
+                summoner.profileIconId,
+                mostChampionName,
+                mostChampionPoints
+
         );
     }
 
@@ -59,6 +71,9 @@ public class RiotService {
             int flexLp,
             int flexWins,
             int flexLosses,
-            int profileIconId
+            int profileIconId,
+            String mostChampionName,
+            int mostChampionPoints
+
     ) {}
 }

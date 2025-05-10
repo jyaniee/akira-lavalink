@@ -45,16 +45,18 @@ public class MatchHistory {
                     .setColor(Color.MAGENTA)
                     .setDescription(
                             String.format(
-                                    "레벨: %d\n\n" +
+                                    "**레벨**\n%d\n\n" +
                                             "**솔로랭크**\n" +
                                             "%s %dLP\n%dW %dL | 승률 %d%%\n\n" +
                                             "**자유랭크**\n" +
-                                            "%s %dLP\n%dW %dL | 승률 %d%%",
+                                            "%s %dLP\n%dW %dL | 승률 %d%%\n\n" +
+                                            "**모스트 챔피언**\n%s (%d점)",
                                     info.level(),
                                     info.soloRank(), info.soloLp(), info.soloWins(), info.soloLosses(),
                                     calcWinRate(info.soloWins(), info.soloLosses()),
                                     info.flexRank(), info.flexLp(), info.flexWins(), info.flexLosses(),
-                                    calcWinRate(info.flexWins(), info.flexLosses())
+                                    calcWinRate(info.flexWins(), info.flexLosses()),
+                                    info.mostChampionName(), info.mostChampionPoints()
                             )
                     )
                     .setThumbnail(getRankImageUrl(info.soloRank()))
