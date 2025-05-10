@@ -1,6 +1,9 @@
 package akira.listener;
 
 import akira.commands.*;
+import akira.riot.RiotApiClient;
+import akira.riot.RiotService;
+import akira.riot.commands.MatchHistory;
 import dev.arbjerg.lavalink.client.LavalinkClient;
 import dev.arbjerg.lavalink.client.LavalinkNode;
 import dev.arbjerg.lavalink.client.player.LavalinkLoadResult;
@@ -27,6 +30,8 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import akira.music.GuildMusicManager;
 
 import org.slf4j.Logger;
@@ -74,7 +79,10 @@ public class CommandHandler extends ListenerAdapter {
                         Commands.slash("볼륨", "음악 볼륨을 조정합니다.")
                                 .addOption(OptionType.INTEGER, "볼륨", "설정할 볼륨 값 (0 ~ 100)", true),
                         Commands.slash("스킵", "현재 재생 중인 곡을 스킵합니다."),
-                        Commands.slash("jpoplist", "개발자의 JPOP 플레이리스트를 대기열에 추가합니다.")
+                        Commands.slash("jpoplist", "개발자의 JPOP 플레이리스트를 대기열에 추가합니다."),
+                        Commands.slash("롤전적", "Riot 전적 정보를 조회합니다.")
+                                .addOption(OptionType.STRING, "이름", "Riot 소환사 이름", true)
+                                .addOption(OptionType.STRING, "태그", "Riot 태그 (예: KR1)", true)
 
                      //   Commands.slash("lava-search", "고급 검색 기능을 사용합니다.")
                      //           .addOption(OptionType.STRING, "query", "검색할 음악 제목", true)
@@ -108,6 +116,11 @@ public class CommandHandler extends ListenerAdapter {
             case "볼륨" -> new Volume(client, this).execute(event);
             case "스킵" -> new Skip(client, this).execute(event);
             case "jpoplist" -> new DeveloperJpopList(client, this).execute(event);
+            case "롤전적" -> {
+                String gameName = event.getOption("이름").getAsString();
+                String tagLine = event.getOption("태그").getAsString();
+                new MatchHistory(new RiotService(new RiotApiClient())).execute(event);
+            }
         }
     }
     @Override
@@ -189,10 +202,28 @@ public class CommandHandler extends ListenerAdapter {
         if(event.getAuthor().isBot()) return;
 
         String content = event.getMessage().getContentRaw();
-
+        String authorId = event.getAuthor().getId();
+        Set<String> restrictedUsers = Set.of("1266912716933693471");
         List<String> bannedKeywords = List.of(
                 "https://tenor.com/view/%EC%98%A4%EB%B9%A0%EC%B0%A8%EC%9E%88%EC%96%B4-%ED%95%9C%EB%82%A8-%EC%A7%B1%ED%83%84-%EA%B5%AD%EC%A3%BC-gif-19897652"
         );
+
+        // 특정 유저 링크 차단
+        if(restrictedUsers.contains(authorId) && content.contains("http")){
+            event.getMessage().delete().queue();
+
+            LOG.info("[삭제됨] 제한 유저 링크 감지: {}", content);
+
+            EmbedBuilder embed = new EmbedBuilder()
+                    .setTitle("🔗 링크 차단됨")
+                    .setDescription("사용자 <@" + authorId + ">는 링크 전송이 제한되어 있습니다.\n메시지가 삭제되었습니다.")
+                    .setColor(0xAA0000)
+                    .setTimestamp(Instant.now());
+
+            event.getChannel().sendMessageEmbeds(embed.build()).queue();
+            return;
+        }
+
         for(String keyword : bannedKeywords){
             if(content.contains(keyword)){
                 event.getMessage().delete().queue();

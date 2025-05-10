@@ -4,6 +4,7 @@ import akira.riot.dto.AccountDto;
 import akira.riot.dto.LeagueEntryDto;
 import akira.riot.dto.SummonerDto;
 import com.google.gson.reflect.TypeToken;
+import io.github.cdimascio.dotenv.Dotenv;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -16,8 +17,9 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 public class RiotApiClient {
+    private static final Dotenv dotenv = Dotenv.load();
     private static final Logger LOG = LoggerFactory.getLogger(RiotApiClient.class);
-    private static final String RIOT_API_KEY = System.getenv("RIOT_TOKEN");
+    private static final String RIOT_API_KEY = dotenv.get("RIOT_TOKEN");
     private static final OkHttpClient client = new OkHttpClient();
     private static final Gson gson = new Gson();
 
