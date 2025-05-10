@@ -15,11 +15,11 @@ public class MatchHistory {
 
     private String getRankImageUrl(String tier) {
         if (tier == null || tier.isBlank() || tier.equalsIgnoreCase("Unranked")) {
-            return "https://opgg-static.akamaized.net/images/medals/default.png";
+            return "https://opgg-static.akamaized.net/images/medals_new/unranked.png?image=q_auto:good,f_webp,w_144";
         }
 
-        String lowerTier = tier.toLowerCase().split(" ")[0]; // "PLATINUM II" → "platinum"
-        return String.format("https://opgg-static.akamaized.net/images/medals/%s.png", lowerTier);
+        String lowerTier = tier.trim().toLowerCase().split(" ")[0]; // e.g. "Platinum III" → "platinum"
+        return String.format("https://opgg-static.akamaized.net/images/medals_new/%s.png?image=q_auto:good,f_webp,w_144", lowerTier);
     }
 
     private String getProfileIconUrl(int iconId) {
