@@ -8,6 +8,7 @@ import dev.arbjerg.lavalink.client.player.SearchResult;
 import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.internal.LavalinkRestClient;
 import dev.arbjerg.lavalink.protocol.v4.LoadResult;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
@@ -21,6 +22,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,5 +184,31 @@ public class CommandHandler extends ListenerAdapter {
         return this.musicManagers.computeIfAbsent(guildId, id -> new GuildMusicManager(id, client));
     }
 
+    @Override
+    public void onMessageReceived(@NotNull net.dv8tion.jda.api.events.message.MessageReceivedEvent event) {
+        if(event.getAuthor().isBot()) return;
+
+        String content = event.getMessage().getContentRaw();
+
+        List<String> bannedKeywords = List.of(
+                "https://tenor.com/view/%EC%98%A4%EB%B9%A0%EC%B0%A8%EC%9E%88%EC%96%B4-%ED%95%9C%EB%82%A8-%EC%A7%B1%ED%83%84-%EA%B5%AD%EC%A3%BC-gif-19897652"
+        );
+        for(String keyword : bannedKeywords){
+            if(content.contains(keyword)){
+                event.getMessage().delete().queue();
+                System.out.println("[CommandHandler] 차단된 키워드 감지 " + keyword);
+                LOG.info("[CommandHandler] 차단된 키워드 감지 {}", keyword);
+                EmbedBuilder embed = new EmbedBuilder()
+                        .setTitle("🚫 차단된 키워드 감지 및 삭제")
+                        .setDescription("사용자 <@" + event.getAuthor().getId() + "> 가 금지된 키워드를 포함한 메시지를 전송하여 삭제되었습니다.")
+                        .addField("차단된 키워드", keyword, false)
+                        .setColor(0xFF0000)
+                        .setTimestamp(Instant.now());
+
+                event.getChannel().sendMessageEmbeds(embed.build()).queue();
+                break;
+            }
+        }
+    }
 
 }
