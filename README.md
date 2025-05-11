@@ -87,9 +87,10 @@ IDE를 이용해서 `Main.java`를 실행하였음.
 
 
 ## 미리보기
-| 실행 화면                              |
-|------------------------------------|
-| ![Bot Status](preview/preview.png) |
+| 실행 화면                                  |
+|----------------------------------------|
+| ![Bot Status](preview/preview.png)     |
+| ![LoL Status](preview/preview-lol.png) |
 
 
 ## 기술 스택
