@@ -1,7 +1,7 @@
 # akira-lavalink
 
-Java 기반 Lavalink를 활용한 디스코드 음악 봇, **아키라**입니다.
-
+Java 기반 Lavalink를 활용한 디스코드 음악 봇, **아키라**입니다.<br>
+**2024년 5월 기준, 롤 전적 검색 기능이 추가되었습니다.** Riot API를 연동하여 소환사의 랭크, 레벨, 모스트 챔피언 정보를 디스코드 임베드로 제공합니다.
 
 ## 주요 기능
 
@@ -12,6 +12,7 @@ Java 기반 Lavalink를 활용한 디스코드 음악 봇, **아키라**입니�
 - **곡 스킵**: 현재 재생 중인 곡을 건너뛰는 기능.
 - **현재 재생 곡 표시**: 현재 재생 중인 음악 정보를 임베드로 제공.
 - **편리한 자동 완성 검색**: 곡 검색 시 자동 완성을 제공하여 빠른 선택이 가능.
+- **롤 전적 검색**: Riot ID를 기반으로 소환사의 솔로랭크, 자유랭크, 레벨, 모스트 챔피언을 출력합니다.
 
 
 ## 설치 및 실행
@@ -20,6 +21,8 @@ Java 기반 Lavalink를 활용한 디스코드 음악 봇, **아키라**입니�
 - **Java 17 이상**
 - [Lavalink](https://github.com/freyacodes/Lavalink) 서버(로컬 또는 원격 실행)
 - Discord 봇 토큰
+- `RIOT_TOKEN`: Riot API 인증을 위한 토큰 (https://developer.riotgames.com/ 에서 발급)
+
 
 ### 2. 환경 변수 설정 및 종속성 설치
 `.env` 파일을 생성하고 아래 내용을 입력:
@@ -28,6 +31,7 @@ BOT_TOKEN=your_discord_bot_token
 LAVALINK_HOST=your_server_host
 LAVALINK_PORT=2333
 LAVALINK_PASSWORD=your_server_password
+RIOT_TOKEN=your_riot_api_key
 ```
 
 **Linux일 경우 exec 플러그인을 사용해 실행:**
@@ -79,6 +83,7 @@ IDE를 이용해서 `Main.java`를 실행하였음.
 | `/안녕`       | 봇이 인사 메시지를 보냅니다.                 | `/안녕`                      |
 | `/정지`       | 음악 재생을 중지하고 대기열을 비웁니다.           | `/정지`                      |
 | `/jpoplist` | 개발자의 추천 JPOP 플레이리스트를 대기열에 추가합니다. | `/jpoplist`                |
+| `/롤전적`     | Riot ID를 입력하여 해당 소환사의 전적을 조회합니다. | `/롤전적 이름:Hideonbush 태그:KR1` |
 
 
 ## 미리보기
