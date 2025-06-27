@@ -50,6 +50,7 @@ public class CharacterInfo {
                 .addField("전투력", formattedPower, false)
                 .addField("환산", String.format("%,d", stat), true)
                 .addField("헥사환산", String.format("%,d", hexaStat), true)
+                .setFooter("Data based on NEXON Open API")
                 .setColor(Color.PINK);
 
         event.getHook().sendMessageEmbeds(embed.build()).queue();
