@@ -131,7 +131,7 @@ public class CommandHandler extends ListenerAdapter {
 
                 switch (sub) {
                     case "기본" -> new CharacterInfo().execute(event);
-                    case "경험치" -> new ExpHistory().execute(event);
+                    // case "경험치" -> new ExpHistory().execute(event);
                 }
             }
         }
