@@ -1,20 +1,16 @@
 package akira.listener;
 
 import akira.commands.*;
+import akira.maple.commands.CharacterInfo;
 import akira.riot.RiotApiClient;
 import akira.riot.RiotService;
 import akira.riot.commands.MatchHistory;
 import dev.arbjerg.lavalink.client.LavalinkClient;
-import dev.arbjerg.lavalink.client.LavalinkNode;
-import dev.arbjerg.lavalink.client.player.LavalinkLoadResult;
-import dev.arbjerg.lavalink.client.player.SearchResult;
-import dev.arbjerg.lavalink.client.player.Track;
 import dev.arbjerg.lavalink.internal.LavalinkRestClient;
 import dev.arbjerg.lavalink.protocol.v4.LoadResult;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -36,8 +32,6 @@ import akira.music.GuildMusicManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.text.html.Option;
 
 public class CommandHandler extends ListenerAdapter {
     private final LavalinkClient client;
@@ -82,7 +76,14 @@ public class CommandHandler extends ListenerAdapter {
                         Commands.slash("jpoplist", "개발자의 JPOP 플레이리스트를 대기열에 추가합니다."),
                         Commands.slash("롤전적", "Riot 전적 정보를 조회합니다.")
                                 .addOption(OptionType.STRING, "이름", "Riot 소환사 이름", true)
-                                .addOption(OptionType.STRING, "태그", "Riot 태그 (예: KR1)", true)
+                                .addOption(OptionType.STRING, "태그", "Riot 태그 (예: KR1)", true),
+                        Commands.slash("메이플", "메이플스토리 관련 명령어입니다.")
+                                .addSubcommands(
+                                        new SubcommandData("기본", "캐릭터 기본 정보를 조회합니다.")
+                                                .addOption(OptionType.STRING, "닉네임", "캐릭터 닉네임", true),
+                                        new SubcommandData("경험치", "캐릭터 경험치 히스토리를 조회합니다.")
+                                                .addOption(OptionType.STRING, "닉네임", "메이플 캐릭터 닉네임", true)
+                                )
 
                      //   Commands.slash("lava-search", "고급 검색 기능을 사용합니다.")
                      //           .addOption(OptionType.STRING, "query", "검색할 음악 제목", true)
@@ -120,6 +121,17 @@ public class CommandHandler extends ListenerAdapter {
                 String gameName = event.getOption("이름").getAsString();
                 String tagLine = event.getOption("태그").getAsString();
                 new MatchHistory(new RiotService(new RiotApiClient())).execute(event);
+            }
+            case "메이플" -> {
+                if (sub == null) {
+                    event.reply("❌ 서브 명령어를 입력하세요. (예: 경험치)").queue();
+                    return;
+                }
+
+                switch (sub) {
+                    case "기본" -> new CharacterInfo().execute(event);
+                    //case "경험치" -> new RealtimeExpTracker().execute(event);
+                }
             }
         }
     }
