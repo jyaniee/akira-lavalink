@@ -2,6 +2,7 @@ package akira.listener;
 
 import akira.commands.*;
 import akira.maple.commands.CharacterInfo;
+import akira.maple.commands.ExpHistory;
 import akira.riot.RiotApiClient;
 import akira.riot.RiotService;
 import akira.riot.commands.MatchHistory;
@@ -130,7 +131,7 @@ public class CommandHandler extends ListenerAdapter {
 
                 switch (sub) {
                     case "기본" -> new CharacterInfo().execute(event);
-                    //case "경험치" -> new RealtimeExpTracker().execute(event);
+                    case "경험치" -> new ExpHistory().execute(event);
                 }
             }
         }
