@@ -13,6 +13,16 @@ public class GuildMusicManager {
     private final LavalinkClient lavalink;
     private TextChannel textChannel;
 
+    private int currentVolume = 35;
+
+    public int getCurrentVolume() {
+        return currentVolume;
+    }
+
+    public void setCurrentVolume(int currentVolume) {
+        this.currentVolume = currentVolume;
+    }
+
     public GuildMusicManager(long guildId, LavalinkClient lavalink) {
         this.lavalink = lavalink;
         this.guildId = guildId;

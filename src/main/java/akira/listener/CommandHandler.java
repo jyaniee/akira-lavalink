@@ -77,7 +77,7 @@ public class CommandHandler extends ListenerAdapter {
                                         new SubcommandData("초기화", "현재 대기열을 초기화합니다.")
                                 ),
                         Commands.slash("볼륨", "음악 볼륨을 조정합니다.")
-                                .addOption(OptionType.INTEGER, "볼륨", "설정할 볼륨 값 (0 ~ 100)", true),
+                                .addOption(OptionType.INTEGER, "볼륨", "설정할 볼륨 값 (0 ~ 100)", false),
                         Commands.slash("스킵", "현재 재생 중인 곡을 스킵합니다."),
                         Commands.slash("jpoplist", "개발자의 JPOP 플레이리스트를 대기열에 추가합니다."),
                         Commands.slash("롤전적", "Riot 전적 정보를 조회합니다.")

@@ -22,13 +22,22 @@ public class Volume {
 
         var volumeOption = event.getOption("볼륨");
         if(volumeOption == null){
+            int currentVolume = commandHandler.getOrCreateMusicManager(guild.getIdLong()).getCurrentVolume();
+            EmbedBuilder infoEmbed = new EmbedBuilder();
+            infoEmbed.setTitle("🔈 현재 볼륨");
+            infoEmbed.setDescription("현재 볼륨은 **" + currentVolume + "**입니다.");
+            infoEmbed.setColor(0x3498DB);
+            event.replyEmbeds(infoEmbed.build()).queue();
+            return;
+            /*
             // event.reply("볼륨 값을 입력하세요! (예: 0 ~ 100)").queue();
             EmbedBuilder errorEmbed = new EmbedBuilder();
             errorEmbed.setTitle("⚠️ 볼륨 값 누락");
             errorEmbed.setDescription("볼륨 값을 입력하세요! (예: 0 ~ 100)");
             errorEmbed.setColor(0xE74C3C);
             event.replyEmbeds(errorEmbed.build()).queue();
-            return;
+
+            return;*/
         }
 
         int volume = volumeOption.getAsInt();
@@ -43,6 +52,7 @@ public class Volume {
         }
 
         GuildMusicManager musicManager = commandHandler.getOrCreateMusicManager(guild.getIdLong());
+        musicManager.setCurrentVolume(volume);
         musicManager.getPlayer().ifPresentOrElse(player -> {
             player.setVolume(volume).subscribe();
             EmbedBuilder successEmbed = new EmbedBuilder();

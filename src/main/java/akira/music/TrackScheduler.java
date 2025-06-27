@@ -165,7 +165,7 @@ public class TrackScheduler {
         this.guildMusicManager.getLink().ifPresent(
                 (link) -> link.createOrUpdatePlayer()
                         .setTrack(track)
-                        .setVolume(35)
+                        .setVolume(this.guildMusicManager.getCurrentVolume())
                         .subscribe()
         );
     }

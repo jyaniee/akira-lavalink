@@ -4,6 +4,7 @@ import dev.arbjerg.lavalink.client.AbstractAudioLoadResultHandler;
 import dev.arbjerg.lavalink.client.Link;
 import dev.arbjerg.lavalink.client.player.*;
 import akira.MyUserData;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import okhttp3.Address;
 import org.jetbrains.annotations.NotNull;
@@ -73,13 +74,23 @@ public class AudioLoader extends AbstractAudioLoadResultHandler {
         track.setUserData(new MyUserData(requesterId, sourceType));
 
         System.out.println("[AudioLoader] Adding track to queue: " + track.getInfo().getTitle());
-        this.mngr.scheduler.enqueue(track);
+      //  this.mngr.scheduler.enqueue(track);
 
         final var trackTitle = track.getInfo().getTitle();
 
         if(!silent) {
             String requesterText = formatRequesterText(requesterId);
-            event.getHook().sendMessage("대기열에 추가되었습니다: " + trackTitle + "\n요청자: " + requesterText).queue();
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle("🎵 대기열에 추가됨");
+            embed.setDescription("**" + trackTitle + "**");
+            embed.addField("요청자", requesterText, false);
+            embed.setColor(0x1DB954);
+            embed.setFooter("Akira Music", event.getJDA().getSelfUser().getAvatarUrl());
+            event.getHook().sendMessageEmbeds(embed.build()).queue(success -> {
+                this.mngr.scheduler.enqueue(track);
+            });
+        }else {
+            this.mngr.scheduler.enqueue(track);
         }
         if(onTrackLoadedCallback != null) {
             onTrackLoadedCallback.run();
