@@ -30,7 +30,7 @@ public class ExpHistory extends ListenerAdapter {
 
             List<String> logs = new ArrayList<>();
             long[] expList = new long[7];
-            int level = -1;
+            int[] levelList = new int[7];
             double lastExpRate = 0;
             String worldName = "";
 
@@ -48,25 +48,31 @@ public class ExpHistory extends ListenerAdapter {
                 }
 
                 long exp = data.getCharacterExp();
+                int level = data.getCharacterLevel();
+
                 expList[i] = exp;
+                levelList[i] = level;
 
                 double expRate = Double.parseDouble(data.getCharacterExpRate());
                 String log = "**" + formatter.format(date) + " :** Lv." + data.getCharacterLevel() +
                         String.format(" %.3f%%", expRate);
 
                 if (i > 0) {
-                    long diff = exp - expList[i - 1];
-                    String diffStr;
+                    long diff;
+                    if(levelList[i] > levelList[i-1]) {
+                        // 레벨업
+                        double prevRate = Double.parseDouble(client.getCharacterBasic(ocid, date.minusDays(1).toString()).getCharacterExpRate());
+                        long prevExp = expList[i - 1];
 
-                    if (diff >= 1_0000_0000_0000L) {
-                        diffStr = String.format(" *(+%,.1f조)*", diff / 1_0000_0000_0000.0);
-                    } else if (diff >= 1_0000_0000L) {
-                        diffStr = String.format(" *(+%,.1f억)*", diff / 1_0000_0000.0);
-                    } else if (diff >= 1_0000L) {
-                        diffStr = String.format(" *(+%,.1f만)*", diff / 1_0000.0);
+                        // 이전 레벨의 총 필요 경험치
+                        long prevTotalExp = (long) (prevExp / (prevRate / 100.0));
+                        long gained = (prevTotalExp - prevExp) + exp;
+                        diff = gained;
                     } else {
-                        diffStr = String.format(" *(+%,d)*", diff);
+                        diff = expList[i] - expList[i - 1];
                     }
+
+                    String diffStr = formatExpDiff(diff);
                     log += diffStr;
                 }
 
@@ -74,6 +80,7 @@ public class ExpHistory extends ListenerAdapter {
                 level = data.getCharacterLevel();
                 lastExpRate = Double.parseDouble(data.getCharacterExpRate());
                 worldName = data.getWorldName();
+
                 try {
                     Thread.sleep(300);
                 } catch (InterruptedException e) {
@@ -83,7 +90,31 @@ public class ExpHistory extends ListenerAdapter {
             }
 
             // 평균 경험치 계산
-            long totalGain = expList[6] - expList[0];
+
+            //long totalGain = expList[6] - expList[0];
+
+            long totalGain = 0;
+            for(int i = 1; i < 7; i++) {
+                long todayExp = expList[i];
+                long yesterdayExp = expList[i - 1];
+                int todayLevel = levelList[i];
+                int yesterdayLevel = levelList[i - 1];
+
+                if (todayLevel == yesterdayLevel) {
+                    // 레벨업 X
+                    totalGain += todayExp - yesterdayExp;
+                } else {
+                    // 레벨업 O
+                    LocalDate prevDate = (i == 6) ? LocalDate.now().minusDays(1) : LocalDate.now().minusDays(6 - i + 1);
+                    CharacterBasicDto prevData = client.getCharacterBasic(ocid, prevDate.toString());
+                    double prevRate = Double.parseDouble(prevData.getCharacterExpRate());
+
+                    long prevTotalExp = (long) (yesterdayExp / (prevRate / 100.0));
+                    long gained = (prevTotalExp - yesterdayExp) + todayExp;
+
+                    totalGain += gained;
+                }
+            }
             double dailyAvg = totalGain / 6.0;
 
             long currentExp = expList[6]; // 마지막 날 경험치량
@@ -96,6 +127,7 @@ public class ExpHistory extends ListenerAdapter {
             // 예상 날짜 계산
             int daysLeft = (int) Math.ceil(expLeft / dailyAvg);
             LocalDate estimatedDate = LocalDate.now().plusDays(daysLeft);
+
             EmbedBuilder embed = new EmbedBuilder();
             embed.setTitle("메이플 경험치 히스토리");
             embed.addField("닉네임", nickname, true);
@@ -128,5 +160,12 @@ public class ExpHistory extends ListenerAdapter {
         } else {
             return String.valueOf(value); // 그대로 출력
         }
+    }
+
+    private String formatExpDiff(long diff) {
+        if (diff >= 1_0000_0000_0000L) return String.format(" *(+%,.1f조)*", diff / 1_0000_0000_0000.0);
+        else if (diff >= 1_0000_0000L) return String.format(" *(+%,.1f억)*", diff / 1_0000_0000.0);
+        else if (diff >= 1_0000L) return String.format(" *(+%,.1f만)*", diff / 1_0000.0);
+        else return String.format(" *(+%,d)*", diff);
     }
 }
