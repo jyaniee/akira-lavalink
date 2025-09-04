@@ -51,7 +51,7 @@ public class CharacterInfo {
                 .addField("환산", String.format("%,d", stat), true)
                 .addField("헥사환산", String.format("%,d", hexaStat), true)
                 .setFooter("Data based on NEXON Open API")
-                .setColor(Color.PINK);
+                .setColor(0x0077ff);
 
         event.getHook().sendMessageEmbeds(embed.build()).queue();
     }

@@ -67,6 +67,25 @@ public class MapleApiClient {
         }
     }
 
+    // 실시간
+    public CharacterBasicDto getCharacterBasic(String ocid) throws IOException {
+        String url = String.format(
+                "https://open.api.nexon.com/maplestory/v1/character/basic?ocid=%s",
+                ocid
+        );
+        LOG.info("[getCharacterBasic] 호출: ocid={} → {}", ocid, url);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("x-nxopen-api-key", MAPLE_API_KEY)
+                .build();
+
+        try (Response response = client.newCall(request).execute()){
+            checkResponse(response);
+            return gson.fromJson(response.body().charStream(), CharacterBasicDto.class);
+        }
+    }
+
     private void checkResponse(Response response) throws IOException {
         if (!response.isSuccessful()) {
             LOG.warn("Maple API 요청 실패: {} - {}", response.code(), response.message());
