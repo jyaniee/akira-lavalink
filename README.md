@@ -89,10 +89,15 @@ IDE를 이용해서 `Main.java`를 실행하였음.
 
 
 ## 미리보기
-| 실행 화면                                  |
-|----------------------------------------|
-| ![Bot Status](preview/preview.png)     |
-| ![LoL Status](preview/preview-lol.png) |
+| 음악 플레이어 | LoL 전적 조회 |
+|--------------|--------------|
+| ![](preview/preview.png) | ![](preview/preview-lol.png) |
+| 음악 재생 및 플레이어 상태 표시 | 소환사 정보 및 전적 조회 |
+
+| 메이플 정보 | 메이플 경험치 |
+|------------|------------|
+| ![](preview/preview-maple-1.png) | ![](preview/preview-maple-2.png) |
+| 메이플 캐릭터 기본 정보 조회 | 최근 7일 경험치 히스토리 및 레벨업 예측 |
 
 
 ## 기술 스택
